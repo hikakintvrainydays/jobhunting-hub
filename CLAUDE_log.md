@@ -31,3 +31,15 @@
   1. `company-analyzer/` 一式を `financial-accounting-quiz@claude/nice-bell-YaHIY` から移植（`company-analyzer/README.md` の手順）。
   2. 移植後、`.claude/agents/` に w0〜w8 の9ファイルが揃うか検証。
   3. `company-analyzer/profile/resume.md`・`drawer.md` を `profile/matsui_dai_knowledge_file_v1.md` を元に整備。
+
+## 2026-06-11 — JOB-HUNTING-HUB 本体スキャフォールド初期化
+
+- **触ったファイル（追加/置換）**
+  - 置換: `README.md` `CLAUDE.md`（運用版＝就活参謀プロンプトへ）／追加: `REQUIREMENTS.md`
+  - 追加: `.claude/agents/`（fact-checker, es-writer, es-reviewer, interviewer, strategist）
+  - 追加: `.claude/commands/`（today, es, drill, fact, pipeline, weekly, analyze）
+  - 追加: `profile/facts.md`(SSOT) `story-parts.md` `axes.md` `weaknesses.md`
+  - 追加: `pipeline/companies.csv` + `pipeline/log/`、`es/`、`interview/qa-bank.md`、`evidence/index.md`、`benchmarks/`（26卒先輩CSV）、`schedule/master-plan.md`
+- **変更概要**: 配布された JOB-HUNTING-HUB.zip の運用スキャフォールド一式を展開。既存の一次資料（profile内の元md/csv/docx, strategy/, seminar/）は温存。
+- **判断理由**: ユーザー指示「初期化」に従い、運用レイヤ（SSOT＋コマンド＋エージェント）を導入。元の一次資料は上書きせず共存（名前衝突なし）。company-analyzer は引き続きスタブ（READMEのみ）。
+- **次アクション**: facts.md の⚠️要確認をユーザーと1件ずつ確定→✅昇格→commit。companies.csv「要調査」締切の埋め方を提案。/today 実行。
