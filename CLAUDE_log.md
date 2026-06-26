@@ -66,6 +66,75 @@
 - **不採用**: SessionStartフック(.claude/hooks/session-start.sh)での自動注入は、auto-modeで「不要な永続化」として遮断されたため見送り。CLAUDE.md経由で要件は充足。希望があればフックは別途ユーザー承認のうえ追加可能。
 - **次アクション**: マイページ確認後の締切値を確度ルールでcompanies.csvへ登録／残⚠️の証拠回収→evidence/index.md。
 
+## 2026-06-26〜27 — company-analyzer 財務連携・Obsidian保管庫・電通検証
+
+### 概要
+「財務分析シートをcompany-analyzerと連携し、先生に見せられるExcelと面接で語れるObsidian台本を出力する」システムを構築。電通グループで実データ検証。
+
+### 作成・変更ファイル一覧
+
+#### バックアップ
+- `company-analyzer-v1-backup/` — 実装前のオリジナルをコピー保存
+- Gitタグ `v1-company-analyzer-original` を付与
+
+#### company-analyzer（変更）
+- `.claude/agents/w0-acquire.md` — 統合報告書 + EDINET10年分有報の取得手順を追加
+- `.claude/agents/w1-factbase.md` — 抽出期間を「10年（直近5年必須）」に拡張。ICR・減損・PBR等を追加
+- `.claude/agents/w4-findiag.md` — 6指標追加（ICR・純資産成長率・PBR推移・減損トレンド・債券格付・R&D比率）。`financial_data.json`スキーマを定義
+- `.claude/agents/w9-formatter.md` — **新設**。W1-W8の出力を面接台本MD＋Excelに変換するエージェント
+- `CLAUDE.md` — パイプライン変更（W9追加・出力先をvault/Excelに変更）
+- `scripts/fill_excel.py` — **新設**。financial_data.jsonを読んで6シートExcelを生成
+- `templates/financial_sheet_template.xlsx` — テンプレートをDownloadsからコピー
+
+#### 出力（実データ）
+- `inputs/dentsu/sources.md` — 電通グループのデータ出典（EDINET/IRBank）
+- `outputs/dentsu/financial_data.json` — 電通10年分の財務データ（IRBankから実取得）
+- `outputs/dentsu/電通グループ_財務分析.xlsx` — 6シートExcel（実数入力済み）
+- `outputs/toyota/financial_data.json` — トヨタ財務データ（fiscal_years更新）
+- `outputs/toyota/トヨタ自動車_財務分析.xlsx` — 同上
+
+#### Obsidian vault
+- `vault/README.md` — 保管庫の使い方・指標基準値一覧
+- `vault/.obsidian/` — Obsidianの設定ファイル（ユーザーが手動で開いて生成）
+- `vault/companies/電通グループ.md` — 面接台本（Q1-Q6 + Q&F26問）
+- `vault/財務経理部長_暗記QA.md` — 財務経理部長の全質問リストへの解答（37問・Callout折りたたみ形式）
+
+### 主要な設計決定
+
+| 決定事項 | 内容 | 理由 |
+|---|---|---|
+| Obsidian vault の場所 | `jobhunting-hub/vault/` | ユーザー選択（他候補: Downloadsなど） |
+| 出力ファイル数 | 企業ごとに2ファイル（MD + Excel） | 文章=Obsidian・数値=Excelで管理 |
+| Sheet1の扱い | テンプレートそのままコピー・データのみ書き込む | 宮西先生に見せる際のフォーマット統一 |
+| 年度表記 | `2023年12月期`形式（FY廃止） | 桜井久勝「財務諸表分析」準拠 |
+| Q&Fの構造 | A.会社固有13問 / B.汎用理論13問 | 認知負荷低減。本文は話す用・Q&Fは深掘り対策用 |
+| 用語基準 | 桜井久勝「財務諸表分析」全面準拠 | ゼミ教科書と揃えることで面接での説明が一貫する |
+
+### 電通グループ検証で判明したデータの穴と原因
+
+| 空白データ | 原因 | 解決策 |
+|---|---|---|
+| CF全年分・ICR全年分 | `inputs/dentsu/`に有報PDFが1枚もない。IRBankから取れる範囲しかWebFetchできなかった | EDINETから有報PDF10年分を手動DLして`inputs/`に入れる → W1が全部読む |
+| セグメント（直近2年のみ） | IRBankのセグメント掲載が直近2〜3年のみ | 有報PDFからW1が抽出 |
+| 総資産回転率・DuPont分解 | 計算に必要な複数数値が揃わずnullのまま | 同上 |
+| EDINETのAPI | v2は`subscription-key`が必要で401エラー | EDINETのAPIキー取得（金融庁に申請・無料）か`claude --chrome`でブラウザ操作 |
+
+**根本原因**: W0（`claude --chrome`でのブラウザ自動化）を実行していないため。PDFがなければW1も動かない。
+
+### 電通グループの主要な発見（面接で使える数字）
+
+- ICR: 2022年12月期5.3倍 → **2023年12月期1.2倍**（要注意水準3倍を大幅下回る）
+- FCF: **2023年12月期-710億**（初のマイナス。2021年12月期は+4,019億）
+- のれん: 8,311億 ≒ 純資産の99%
+- EMEA利益: 2022年12月期519億 → **2023年12月期242億（-53%）**
+- 日本基準なら: のれん20年償却で毎年約415億の追加利益圧迫
+
+### 次アクション（このセッションで残したもの）
+1. **有報PDFの配置**: EDINETから電通（E04760）の有報10年分を手動DLして`inputs/dentsu/`に入れる
+2. **次の企業分析**: `claude --chrome`で起動 → `分析: 三菱商事` で本番パイプラインを動かす
+3. **Obsidianの設定**: Spaced Repetitionプラグインを導入するとQ&Fがカード形式で使える
+4. **w9-formatter.mdの注記**: vault絶対パス `C:/Users/kiham/Developer/jobhunting-hub/vault` が固定されている。移動したら要更新
+
 ## 2026-06-26 — company-analyzer 移植完了 & ハブ起動
 
 - **触ったファイル**: `company-analyzer/`（全体追加）、`company-analyzer/README_PLACE_HERE.md`（削除）
