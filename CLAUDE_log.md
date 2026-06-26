@@ -65,3 +65,14 @@
 - **判断理由**: ユーザー要望「取得情報をハブのチャット全体でいつでも引き出せるように」に対応。各チャットは記憶を持たないため、(1)情報はfacts.md(コミット済)に永続保存、(2)CLAUDE.md(毎セッション自動ロード)で必ずfacts.mdを読ませる、の2層で自動リコールを実現。
 - **不採用**: SessionStartフック(.claude/hooks/session-start.sh)での自動注入は、auto-modeで「不要な永続化」として遮断されたため見送り。CLAUDE.md経由で要件は充足。希望があればフックは別途ユーザー承認のうえ追加可能。
 - **次アクション**: マイページ確認後の締切値を確度ルールでcompanies.csvへ登録／残⚠️の証拠回収→evidence/index.md。
+
+## 2026-06-26 — company-analyzer 移植完了 & ハブ起動
+
+- **触ったファイル**: `company-analyzer/`（全体追加）、`company-analyzer/README_PLACE_HERE.md`（削除）
+- **変更概要**:
+  - `hikakintvrainydays/financial-accounting-quiz` の `claude/nice-bell-YaHIY` ブランチから `company-analyzer/` 一式をコピー移植。
+  - `.claude/agents/` に w0〜w8 の9ファイルを確認（全揃い）。
+  - 旧プレースホルダ `README_PLACE_HERE.md` を削除。`README.md` はソース元の本番版に差し替え済み。
+  - リポジトリ clone 先: `C:\Users\kiham\Developer\jobhunting-hub`（`claude/friendly-carson-vbbe4r` ブランチ）。
+- **判断理由**: ローカル環境での初回起動セッション。clone後ローカルからファイル取得に制限がないため移植を実施。
+- **次アクション**: companies.csv の「要調査」締切を埋める（各社マイページ確認）。`/today` で今日のアクションを確定。

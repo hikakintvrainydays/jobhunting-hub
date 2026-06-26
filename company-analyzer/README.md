@@ -1,35 +1,118 @@
-# company-analyzer（移植 保留中）
+# 企業分析 → 面接素材 自動生成システム
+### Healy × Damodaran ベース / Claude Code「統合AI＋働きAI」構成 / 外部API非依存
 
-このフォルダは、就活ハブの**中核**となる「企業分析→面接素材 自動生成システム」の置き場所です。
-本来の中身（`CLAUDE.md` ＋ `.claude/agents/w0〜w8` ＋ `profile/` ＋ `inputs/` ＋ `outputs/`）は、
-別リポジトリ `hikakintvrainydays/financial-accounting-quiz` のブランチ `claude/nice-bell-YaHIY` の
-`company-analyzer/` にあります。
+就活で「財務専攻として、自分で考え、作り、企業を深く理解した」と示すための分析基盤。
+有報・中期経営計画などのファイルを渡すと、面接でそのまま使える素材（なぜ当社か・想定問答・
+自分で考えた示唆）を生成する。
 
-## 現状（なぜ空か）
+---
 
-このセットアップを実行したセッションでは、ソース元の `financial-accounting-quiz` リポジトリが
-**本セッションのスコープ外**で、ファイルを取得できませんでした。そのため中身を**創作せず**、
-本READMEのみを置いています（資料の創作禁止ルールに従う）。
+## 0. 設計思想（なぜ面接で勝てるか）
 
-## 移植のやり方（次にやること）
+- **出力＝レポートではなく「面接の弾薬」。** 最重要アウトプットは2つ:
+  - **① 財務的改善余地**（"自分が中にいたら、どこで価値が漏れていて、どう直すか"＝自分で考えた示唆）
+  - **② その企業のNo.1要素**（"この会社が世界/業界で本当に一番なのは何か"＝なぜ当社かの核）
+- **資料取得もシステム内で完結（Claude in Chrome）。** `claude --chrome` で起動すると、Claude Code が
+  ブラウザを操作して公式IRサイト／EDINETから**最新の有報・中計・決算説明会資料を自動ダウンロード**し
+  `inputs/<company>/` に保存する。手で集めてもよい（両対応）。
+- **データAPIには依存しない。** 上記はデータベンダーのAPIを叩くのではなく、人間と同じように
+  公式サイトを開いてPDFを落とす方式。数値計算が要る所だけ Claude Code 内の Python に回す。
+- **どの企業にも使い回せる。** `inputs/<company>/` を差し替えるだけ。フレームワークは企業非依存。
+- **自分のプロフィールを食わせる。** `profile/` に履歴書＋引き出し集を入れると、分析が
+  「なぜ"僕が"この会社か」に変換され、想定問答まで自分の語り口で生成される。
+- **ハルシネーション対策。** 最初に「事実抽出(W1)」を置き、以降の推論は必ず出典に紐づける。
+  事実と推論を明示的に分け、資料にない数字は創作しない。
 
-ソースにアクセスできるセッション、または手元の作業環境で、以下のいずれかで移植してください。
-**`git mv` ではなくファイルコピー**で行い、元リポジトリには手を加えないこと（読み取り専用扱い）。
+---
 
-```bash
-# 例）別ディレクトリに source repo を clone してコピー
-git clone https://github.com/hikakintvrainydays/financial-accounting-quiz.git /tmp/faq
-cd /tmp/faq && git checkout claude/nice-bell-YaHIY
+## 1. フォルダ構成
 
-# 隠しディレクトリ（.claude/）の取りこぼしに注意してコピー
-cp -a /tmp/faq/company-analyzer/. /path/to/job-hunting-hub/company-analyzer/
+```
+company-analyzer/
+├── README.md                  # これ
+├── CLAUDE.md                  # 統合AI（オーケストレーター）の常時指示
+├── .claude/agents/            # 働きAI（サブエージェント定義）
+│   ├── w0-acquire.md    ├── w4-findiag.md    ├── w7-valuegap.md
+│   ├── w1-factbase.md   ├── w5-acctquality.md └── w8-context.md
+│   ├── w2-bizmodel.md   ├── w6-futurecheck.md
+│   └── w3-moat.md
+├── profile/
+│   ├── resume.md              # 自分の経歴・実績（KINTO/Vibe coding/タイツアー等）
+│   └── drawer.md              # 引き出し集（STAR・原体験・強み弱み）
+├── inputs/<company>/          # 例: toyota/, kawasaki-kisen/（Phase 0で自動取得 or 手動配置）
+│   ├── yuho.pdf   ├── chukei.pdf   ├── ir/   ├── news.md   ├── peers.md   └── sources.md
+└── outputs/<company>/         # 自動生成（00_facts.md 〜 INTERVIEW_PACK.md）
 ```
 
-または、`company-analyzer/` 一式を zip で受け取り、本フォルダへ解凍する。
+---
 
-## 移植後の検証
+## 2. アーキテクチャ（統合AI ＋ 働きAI）
 
-- `company-analyzer/.claude/agents/` に **w0〜w8 の9ファイル**が揃っているか確認。欠けていれば報告。
-- `company-analyzer/profile/resume.md`・`drawer.md` が雛形なら、
-  `../profile/matsui_dai_knowledge_file_v1.md` を元に中身を埋める。
-- 移植が済んだら、この README を削除し、`CLAUDE_log.md` に移植記録を追記する。
+```
+   「分析: toyota」
+        │
+        ▼
+  ┌─────────────────────────────────────┐
+  │ Phase 0: 資料取得（Claude in Chrome）  │  ← claude --chrome
+  │ 公式IR/EDINETを開き有報・中計DLし保存   │     inputs/ が空の時だけ実行
+  └────────────────┬────────────────────┘
+                   ▼
+  ┌──────────────────────────────────────┐
+  │  統合AI（CLAUDE.md / orchestrator）      │
+  └────────────────┬─────────────────────┘
+                   │ 並列ディスパッチ
+   ┌──────┬──────┬─┴────┬──────┬──────┬──────┐
+  W1     W2     W3     W4     W5     W6   W7  W8
+ 事実   事業   No.1   財務   会計   中計  改善 文脈
+ 抽出   構造   優位   診断    質    評価  余地 ﾄﾚﾝﾄﾞ
+   └──────┴──────┴──┬───┴──────┴──────┴──────┘
+                   │ 全出力 ＋ profile/ を統合
+                   ▼
+        ┌─────────────────────────┐
+        │ 統合AI: INTERVIEW_PACK.md  │
+        │ （なぜ当社/想定問答/逆質問）│
+        └─────────────────────────┘
+```
+
+- **Phase 0（資料取得）**：`claude --chrome` で起動すると、`inputs/<company>/` が空の時に
+  Claude Code がブラウザを操作して公式IR／EDINETから最新の有報・中計・決算説明会資料を取得・保存する。
+  既に資料があればスキップ。手動配置でもよい。
+
+- **働きAIは並列実行**（Claude Code の Task/サブエージェントで分担）。各 worker は担当だけに集中し、
+  決まったスキーマで `outputs/<company>/` に書く。
+- **計算は Python で。** W4 など数値が要る所は worker が Claude Code 内で Python を書いて
+  有報の数値から ROIC・DuPont 等を計算する（手計算で誤魔化さない）。
+- 手動派なら、各 worker プロンプトを順番にチャットへ貼って回してもよい。
+
+---
+
+## 3. 今夜のセットアップ手順
+
+1. このフォルダを Claude Code のプロジェクトとして開く。
+2. `profile/resume.md` と `profile/drawer.md` を自分の中身で埋める（回答の"自分らしさ"の源泉。手を抜かない）。
+3. 資料を用意する。**どちらでもよい**:
+   - **自動取得**：`claude --chrome` で起動（要：Claude Code v2.0.73+／Chrome拡張v1.0.36+／有料直契約プラン
+     Pro・Max・Teams・Enterprise／Chrome or Edge／ベータ）。`分析: <company>` でPhase 0が公式IR・EDINETから取得。
+   - **手動**：最初の1社（**川崎汽船** か **トヨタ**）の `inputs/<company>/` に有報・中計・IRのPDFを入れる。
+4. `分析: <company>` と打つ → （必要なら）Phase 0で資料取得 → W1〜W8 が走り →
+   `outputs/<company>/INTERVIEW_PACK.md` が出る。
+5. 出力を読み、**自分の言葉に直す**（AIの文をそのまま暗記しない＝面接で剥がれる）。
+   「自分で考えた示唆」だけは特に磨く。
+
+### 資料自動取得（Phase 0）の注意
+- ブラウザ自動化は**ベータ**。実ブラウザでリアルタイムに動くため**やや遅い**ことがある。
+- ログイン／CAPTCHA／有料壁に当たると**停止して手動対応を求める**（勝手に回避しない）。
+- 取得したPDFが「正しい企業・正しい最新年度」かは**人間が最終確認**する（古い年度や子会社の資料を掴むことがある）。
+- 取得元は `inputs/<company>/sources.md` に記録される。分析の出典確認に使う。
+
+### 精度を上げるコツ
+- 資料は多いほど良い（有報＋中計＋統合報告書＋直近決算説明会＋ニュース）。
+  **`peers.md` に競合数値**を入れると W4 比較と No.1 判定が一気に鋭くなる。
+- まず1社を完璧に仕上げ、テンプレを固めてから横展開する（散らかさない）。
+- 完成した `INTERVIEW_PACK.md` の「自分で考えた示唆」を持って、宮西先生経由で
+  現役の財務担当（Sony / 川崎汽船OB 等）にレビューを頼むと「現役プロに壁打ちした」実績になる
+  （現物があるから話が通る）。
+
+### 現実的な注意
+- 1社分の分析は数分で終わる（一晩はかからない）。「寝てる間に勝手に完成」ではなく、
+  今夜セットアップ→最初の1社を回す、が現実的なゴール。
