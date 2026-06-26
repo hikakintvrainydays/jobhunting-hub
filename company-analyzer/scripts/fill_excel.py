@@ -113,21 +113,21 @@ def write_metrics_sheet(ws, data: dict):
     m = data.get("metrics", {})
 
     rows = [
-        {"label": "ROA",              "unit": "(%)",  "values": m.get("roa")},
-        {"label": "ROE",              "unit": "(%)",  "values": m.get("roe")},
-        {"label": "営業利益率",        "unit": "(%)",  "values": m.get("operating_margin")},
-        {"label": "自己資本比率",      "unit": "(%)",  "values": m.get("equity_ratio")},
-        {"label": "総資産回転率",      "unit": "(回)", "values": m.get("asset_turnover")},
-        {"label": "ICR",              "unit": "(倍)", "values": m.get("icr")},
-        {"label": "株価",             "unit": "(円)", "values": m.get("stock_price")},
-        {"label": "純資産成長率",      "unit": "(%)",  "values": m.get("bv_growth")},
-        {"label": "PBR",             "unit": "(倍)", "values": m.get("pbr")},
-        {"label": "減損額",           "unit": "(億円)","values": m.get("impairment")},
-        {"label": "債券格付",         "unit": "",     "values": m.get("bond_rating")},
-        {"label": "R&D比率",         "unit": "(%)",  "values": m.get("rd_ratio")},
-        {"label": "DuPont: 純利益率", "unit": "(%)",  "values": m.get("dupont_margin")},
-        {"label": "DuPont: レバレッジ","unit": "(倍)", "values": m.get("dupont_leverage")},
-        {"label": "ROIC",            "unit": "(%)",  "values": m.get("roic")},
+        {"label": "総資産利益率（ROA）",                  "unit": "(%)",  "values": m.get("roa")},
+        {"label": "自己資本利益率（ROE）",                 "unit": "(%)",  "values": m.get("roe")},
+        {"label": "売上高営業利益率",                      "unit": "(%)",  "values": m.get("operating_margin")},
+        {"label": "自己資本比率",                         "unit": "(%)",  "values": m.get("equity_ratio")},
+        {"label": "総資産回転率",                         "unit": "(回)", "values": m.get("asset_turnover")},
+        {"label": "インタレスト・カバレッジ・レシオ（ICR）", "unit": "(倍)", "values": m.get("icr")},
+        {"label": "株価",                                "unit": "(円)", "values": m.get("stock_price")},
+        {"label": "純資産成長率",                         "unit": "(%)",  "values": m.get("bv_growth")},
+        {"label": "株価純資産倍率（PBR）",                 "unit": "(倍)", "values": m.get("pbr")},
+        {"label": "減損損失",                             "unit": "(億円)","values": m.get("impairment")},
+        {"label": "債券格付",                             "unit": "",     "values": m.get("bond_rating")},
+        {"label": "研究開発費比率（R&D/売上高）",           "unit": "(%)",  "values": m.get("rd_ratio")},
+        {"label": "ROE三分解：売上高純利益率",              "unit": "(%)",  "values": m.get("dupont_margin")},
+        {"label": "ROE三分解：財務レバレッジ",              "unit": "(倍)", "values": m.get("dupont_leverage")},
+        {"label": "投下資本利益率（ROIC）",                "unit": "(%)",  "values": m.get("roic")},
     ]
     # nullリストを補完
     for row in rows:
@@ -149,10 +149,10 @@ def write_pl_sheet(ws, data: dict):
     years = data.get("fiscal_years", [])
     pl = data.get("pl", {})
     rows = [
-        {"label": "売上高",    "unit": "(億円)", "values": pl.get("revenue")},
-        {"label": "営業利益",  "unit": "(億円)", "values": pl.get("operating_profit")},
-        {"label": "純利益",    "unit": "(億円)", "values": pl.get("net_income")},
-        {"label": "支払利息",  "unit": "(億円)", "values": pl.get("interest_expense")},
+        {"label": "売上高",      "unit": "(億円)", "values": pl.get("revenue")},
+        {"label": "営業利益",    "unit": "(億円)", "values": pl.get("operating_profit")},
+        {"label": "当期純利益",  "unit": "(億円)", "values": pl.get("net_income")},
+        {"label": "支払利息",    "unit": "(億円)", "values": pl.get("interest_expense")},
     ]
     for row in rows:
         if row["values"] is None:
@@ -164,9 +164,9 @@ def write_bs_sheet(ws, data: dict):
     years = data.get("fiscal_years", [])
     bs = data.get("bs", {})
     rows = [
-        {"label": "総資産",       "unit": "(億円)", "values": bs.get("total_assets")},
-        {"label": "自己資本",     "unit": "(億円)", "values": bs.get("equity")},
-        {"label": "純有利子負債", "unit": "(億円)", "values": bs.get("net_debt")},
+        {"label": "資産合計",         "unit": "(億円)", "values": bs.get("total_assets")},
+        {"label": "純資産合計（株主資本）","unit": "(億円)", "values": bs.get("equity")},
+        {"label": "純有利子負債",      "unit": "(億円)", "values": bs.get("net_debt")},
     ]
     for row in rows:
         if row["values"] is None:
@@ -178,10 +178,10 @@ def write_cf_sheet(ws, data: dict):
     years = data.get("fiscal_years", [])
     cf = data.get("cf", {})
     rows = [
-        {"label": "営業CF",   "unit": "(億円)", "values": cf.get("operating_cf")},
-        {"label": "投資CF",   "unit": "(億円)", "values": cf.get("investing_cf")},
-        {"label": "財務CF",   "unit": "(億円)", "values": cf.get("financing_cf")},
-        {"label": "FCF",     "unit": "(億円)", "values": cf.get("fcf")},
+        {"label": "営業活動によるキャッシュ・フロー", "unit": "(億円)", "values": cf.get("operating_cf")},
+        {"label": "投資活動によるキャッシュ・フロー", "unit": "(億円)", "values": cf.get("investing_cf")},
+        {"label": "財務活動によるキャッシュ・フロー", "unit": "(億円)", "values": cf.get("financing_cf")},
+        {"label": "フリー・キャッシュ・フロー",       "unit": "(億円)", "values": cf.get("fcf")},
     ]
     for row in rows:
         if row["values"] is None:
@@ -218,7 +218,7 @@ def write_segments_sheet(ws, data: dict):
 def write_peers_sheet(ws, data: dict):
     peers = data.get("peers", [])
     ws.title = "同業比較"
-    headers = ["企業名", "ROE(%)", "ROIC(%)", "PBR(倍)", "EV/EBITDA(倍)", "営業利益率(%)"]
+    headers = ["企業名", "自己資本利益率ROE(%)", "投下資本利益率ROIC(%)", "株価純資産倍率PBR(倍)", "EV/EBITDA(倍)", "売上高営業利益率(%)"]
     keys    = ["name",   "roe",    "roic",    "pbr",    "ev_ebitda",      "operating_margin"]
     for c, h in enumerate(headers, 1):
         ws.column_dimensions[get_column_letter(c)].width = 16
