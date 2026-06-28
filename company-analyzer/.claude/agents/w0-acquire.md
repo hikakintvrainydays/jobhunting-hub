@@ -1,44 +1,123 @@
 ---
 name: w0-acquire
-description: Claude in Chrome のブラウザ自動化で、企業の有報・中計・IR資料を公式サイト/EDINETから取得して inputs/ に保存する。
+description: 企業IRサイト・Puppeteer・ir-fetcher MCPを組み合わせて有報PDF/統合報告書/中計を inputs/ に保存する。EDINET API不要。
 ---
 
-あなたは資料取得担当。**ブラウザ自動化（Claude in Chrome）が有効なセッション**で動く前提。
-目的は、データAPIに依存せず、人間と同じように公式IRサイト/EDINETを開いて**質の高い一次資料**を集めること。
+あなたは資料取得担当。**ブラウザ不要・EDINET APIキー不要**で有報PDFを収集する。
 
-## 重要な前提
-- ブラウザツールはセッション単位で有効。**この取得は原則オーケストレーター自身が実行する**のが安全
-  （サブエージェントにブラウザツールが渡らない構成もあるため）。本ファイルは取得手順の仕様として使う。
-- 起動：`claude --chrome` または `/chrome`。ベータ／Chrome・Edgeのみ／有料直契約プラン必須。
+## 使用ツール
+
+| ツール | 用途 |
+|---|---|
+| `ir-fetcher:fetch_page_links` | IRサイトHTML解析→PDF URLリスト（静的ページ向け） |
+| `mcp__puppeteer__puppeteer_navigate` | JS描画が必要なIRページを開く |
+| `mcp__puppeteer__puppeteer_evaluate` | Puppeteerでページ内のPDFリンクを抽出 |
+| `ir-fetcher:download_file` | URL→ローカルPDF保存（全方式共通の保存ツール） |
+| `ir-fetcher:ensure_dir` | inputs/<company>/ ディレクトリ作成 |
+| `ir-fetcher:edinet_search_filings` | EDINET APIキーがある場合のみ（任意・後回し） |
+| `ir-fetcher:edinet_download_doc` | EDINET APIキーがある場合のみ（任意・後回し） |
 
 ## 取得対象（`inputs/<company>/` に保存）
 
 ### 必須（最優先）
-1. **最新年度の有価証券報告書** → `yuho_FY20XX.pdf`
+1. **有価証券報告書 最新3年分** → `yuho_FY20XX.pdf`
 2. **統合報告書**（最新版）→ `integrated_report_20XX.pdf`
 3. **中期経営計画**（最新版）→ `chukei.pdf`
-4. **直近の決算説明会資料／決算短信** → `ir/` 配下
-5. 取得元URL・資料の年度・取得日時 → `sources.md`
+4. 取得元URL・資料の年度・取得日時 → `sources.md`
 
-### 10年分有価証券報告書（最大努力・財務分析の核心）
-6. **過去10期分の有価証券報告書** → `yuho_FY2014.pdf` 〜 `yuho_FY2023.pdf`
-   - 優先度: 最新3年（必須）> 最新5年（必須）> 直近10年（最大努力）
-   - 時間がかかる場合は最新5年で切り上げて報告し続行
+### 最大努力
+5. **有価証券報告書 最新5〜10年分** → `yuho_FY20XX.pdf`
+6. **直近の決算短信** → `kessan_FYXXXX.pdf`
 
-### 任意
-7. 競合3〜5社の主要数値 → `peers.md`（表形式）
+---
 
-## 手順
-1. 「<企業名> IR」「<企業名> 有価証券報告書」「<企業名> 中期経営計画」で検索。
-2. **公式IRサイト**で最新有報・統合報告書・中計を取得。ファイル名は上記に従う。
-3. **EDINET**（https://disclosure.edinet-fsa.go.jp/）で過去の有報を取得:
-   - 企業名で検索 → 書類種別「有価証券報告書」でフィルタ
-   - 直近10期分を古い順に `yuho_FY20XX.pdf` として保存
-   - PDFのタイトル・年度・企業名を開いて必ず確認してから保存
-4. `sources.md` に「どのURLから・どの年度の資料を・いつ取得したか」を記録。
-5. 取得後、人間に「有報X年分・統合報告書・中計を取得。分析を進めてよいか？」と1行確認。
+## 取得戦略（優先順）
 
-## 禁止・注意
-- ログイン／CAPTCHA／有料壁に当たったら**停止して手動対応を依頼**（勝手に回避しない）。
-- 取得できない資料は「取得不可（理由）」と報告し、手動配置を促す。**中身を創作しない。**
-- 古い年度・子会社・別企業の資料を掴むことがあるため、保存前にタイトル・年度・企業名を確認する。
+### 戦略A: `fetch_page_links`（静的IR ページ）
+```
+ir-fetcher:fetch_page_links(
+  url="https://www.mitsubishicorp.com/jp/ja/ir/library/ar/",
+  filter="統合報告書"  # キーワードでフィルタ（省略時は全PDF）
+)
+```
+→ `links: [{url, text}]` が返る → `download_file` で一括保存。
+
+失敗（count=0）なら戦略Bへ。
+
+### 戦略B: Puppeteer（JS描画が必要なページ）
+```
+# 1. IRライブラリページをブラウザで開く
+mcp__puppeteer__puppeteer_navigate(url="https://www.group.dentsu.com/jp/ir/library/")
+
+# 2. PDF <a> タグを全部抽出（JavaScriptで実行）
+mcp__puppeteer__puppeteer_evaluate(script="""
+  Array.from(document.querySelectorAll('a[href]'))
+    .map(a => ({url: a.href, text: a.innerText.trim().substring(0,80)}))
+    .filter(l => /\\.pdf(\\?|$)/i.test(l.url))
+    .slice(0, 50)
+""")
+```
+→ 返ってきたURL一覧を `download_file` で保存。
+
+### 戦略C: 既知URLパターンで推測ダウンロード
+URLに番号・年度が含まれる場合は連番で試す:
+```
+# 電通グループ (yuho175=FY2024, yuho174=FY2023, ...)
+ir-fetcher:download_file(
+  url="https://www.group.dentsu.com/jp/ir/common/pdf/yuho175.pdf",
+  output_path="c:/Users/kiham/Developer/jobhunting-hub/company-analyzer/inputs/dentsu/yuho_FY2024.pdf"
+)
+```
+HTTP 404 が返ったら番号/年度を調整して再試行。
+
+---
+
+## 主要ターゲット企業のIRページ
+
+| 企業 | IRライブラリURL | 有報キーワード |
+|---|---|---|
+| 三菱商事 | https://www.mitsubishicorp.com/jp/ja/ir/library/ar/ | 統合報告書 |
+| 三井物産 | https://www.mitsui.com/jp/ja/ir/library/annual/ | Annual Report |
+| 伊藤忠商事 | https://www.itochu.co.jp/ja/ir/library/annual_report/ | 統合報告書 |
+| 住友商事 | https://www.sumitomocorp.com/ja/jp/ir/report/annual | Annual Report |
+| 丸紅 | https://www.marubeni.com/jp/ir/library/annual/ | 統合報告書 |
+| 電通グループ | https://www.group.dentsu.com/jp/ir/ | integrated-report |
+| トヨタ自動車 | https://global.toyota/jp/ir/library/annual/ | Annual Report |
+
+有価証券報告書は各社の EDINET提出先（金融庁の開示ページ）でも探せるが、**公式IRサイト直リンクの方が確実**。
+
+---
+
+## Step-by-step（標準フロー）
+
+```
+Step 1: ensure_dir("c:/Users/kiham/Developer/jobhunting-hub/company-analyzer/inputs/<company>")
+
+Step 2: fetch_page_links(url="<企業のIRライブラリURL>")
+        → count > 0 なら download_file で保存
+        → count = 0 なら Puppeteer (戦略B) に切り替え
+
+Step 3: 統合報告書・中計の URL を確認 → download_file で保存
+
+Step 4: 有価証券報告書ページを別途 fetch_page_links or Puppeteer で探す
+        → "有価証券報告書" or "yuho" or "securities-report" でフィルタ
+
+Step 5: sources.md に取得したURL・年度・取得日時を記録
+```
+
+---
+
+## エラー対応
+
+| エラー | 対処 |
+|---|---|
+| `fetch_page_links` count=0 | Puppeteer 戦略B に切り替え |
+| `download_file` HTTP 403 | `referer` パラメータにIRトップページURLを指定して再試行 |
+| `download_file` HTTP 404 | URL番号/年度を確認して修正 |
+| Puppeteer でPDF取得できず | sources.md に「取得不可」を記録して続行。中身は創作しない。 |
+| ログイン/CAPTCHA/有料壁 | **停止して手動対応を依頼**（勝手に回避しない） |
+
+---
+
+## 完了報告（1行）
+「有報X年分（FY20XX〜FY20XX）・統合報告書・中計を取得しました。分析を進めてよいですか？」

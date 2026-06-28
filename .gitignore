@@ -1,0 +1,22 @@
+# ===== 機密情報 =====
+# Twitter Bearer Token / Google OAuth などの秘密鍵を含むため除外
+.mcp.json
+.claude/settings.json
+.claude/settings.local.json
+
+# ===== 大容量バイナリ（有報PDF・統合報告書PDF等） =====
+company-analyzer/inputs/
+
+# ===== Node.js =====
+node_modules/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== Python =====
+__pycache__/
+*.pyc
+*.pyo
+.env

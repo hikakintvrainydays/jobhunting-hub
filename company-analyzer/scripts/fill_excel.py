@@ -30,6 +30,7 @@ fill_excel.py  --  financial_data.json を読み込み、財務分析Excelを生
 
 import sys
 import json
+import re
 import shutil
 from pathlib import Path
 
@@ -107,13 +108,20 @@ def fill_sheet1_template(ws, data: dict):
     recent_years = last5(years)
     pad = 5 - len(recent_years)  # データが5年未満の場合の左パディング数
 
-    # ── 年度ヘッダー (Row 5) ──
+    def extract_year_int(fy_str):
+        """'2023年12月期' → 2023 (整数)。数字だけならそのまま返す。"""
+        if isinstance(fy_str, int):
+            return fy_str
+        m = re.search(r'(\d{4})', str(fy_str))
+        return int(m.group(1)) if m else fy_str
+
+    # ── 年度ヘッダー (Row 5) — テンプレートと同じ整数形式 ──
     for i in range(5):
         cell = ws[f"{DATA_COLS[i]}5"]
         if i < pad:
             cell.value = None
         else:
-            cell.value = recent_years[i - pad]
+            cell.value = extract_year_int(recent_years[i - pad])
 
     # ── 数値指標行 (Row 6〜14, 17) ──
     numeric_keys = [
@@ -141,6 +149,22 @@ def fill_sheet1_template(ws, data: dict):
         else:
             v = ratings[i - r_pad]
             cell.value = v if v else "-"
+
+    # ── ROIC行 (Row 19) — テンプレート外の追加行 ──
+    roic_vals = last5(m.get("roic") or [])
+    r_pad2 = 5 - len(roic_vals)
+    ws["C19"] = "ROIC(%)"
+    for i in range(5):
+        cell = ws[f"{DATA_COLS[i]}19"]
+        if i < r_pad2:
+            cell.value = "-"
+        else:
+            cell.value = fmt(roic_vals[i - r_pad2])
+
+    # ── WACC (J19 にコメントとして付記) ──
+    wacc = data.get("metrics", {}).get("wacc")
+    if wacc is not None:
+        ws["J19"] = f"WACC想定 {wacc}%（仮置き）"
 
     # ── セグメント行 (Row 15〜16) ──
     # Row15: ラベル行（テンプレートのD15=国内, F15=海外）は残す。

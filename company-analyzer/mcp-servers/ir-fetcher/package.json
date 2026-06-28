@@ -1,0 +1,15 @@
+{
+  "name": "ir-fetcher",
+  "version": "1.0.0",
+  "description": "EDINET API v2 + 直接URL取得で有報PDFをローカルに保存するMCPサーバー",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0",
+    "adm-zip": "^0.5.16",
+    "zod": "^3.24.0"
+  }
+}

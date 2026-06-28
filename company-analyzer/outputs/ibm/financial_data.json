@@ -1,0 +1,195 @@
+{
+  "company": "日本IBM",
+  "currency": "USD_million",
+  "note": "IBM Corp連結。12月期（1月〜12月）。日本IBM単体は非公開のためnull。FY2022総資産は公開FY2022 10-K既知値。ROIC・ICRはGAAP年金精算費用（非現金・一過性）を除く非GAAP調整後を併記。",
+  "fiscal_years": ["FY2022", "FY2023", "FY2024"],
+  "metrics": {
+    "roe": [7.9, 33.6, 24.1],
+    "roa": [1.3, 5.6, 4.4],
+    "operating_margin": [13.5, 15.2, 14.9],
+    "equity_ratio": [17.3, 16.7, 20.0],
+    "icr": [6.8, 6.4, 6.2],
+    "icr_note": "非GAAP調整後（年金精算費用除く）。GAAP ICRはFY2022: 1.95x, FY2024: 4.39x",
+    "bv_growth": [null, 2.7, 21.1],
+    "pbr": [null, null, null],
+    "stock_price": [null, null, null],
+    "impairment": [0, 0, 0],
+    "impairment_note": "FY2024年次定量テスト結果：全報告ユニットで公正価値が帳簿価額を実質的に上回り、減損なし",
+    "bond_rating": ["A-", "A-", "A-"],
+    "rd_ratio": [10.9, 10.9, 11.9],
+    "asset_turnover": [0.476, 0.471, 0.461],
+    "dupont_margin": [2.7, 12.1, 9.6],
+    "dupont_leverage": [6.21, 5.88, 5.45],
+    "roic": [8.3, 11.5, 11.4],
+    "roic_note": "非GAAP調整後（年金精算費用除く）。IC = 有利子負債 + 自己資本。NOPAT = adj.EBIT × (1 - 実効税率)",
+    "wacc": 7.5,
+    "wacc_note": "仮置き。Ke=9.3%(Rf4.3%+β1.0×ERP5.0%), Kd=3.5%(税後), D/V=67%, E/V=33%。アナリストコンセンサス7〜9%の中央値"
+  },
+  "pl": {
+    "revenue": [60530, 61860, 62753],
+    "gross_profit": [32687, 34300, 35551],
+    "gross_margin_pct": [54.0, 55.4, 56.7],
+    "operating_profit": [8175, 9382, 9381],
+    "operating_profit_note": "= Revenue - Total Cost - SG&A - RD&E + IP income（GAAP, その他income/expense・支払利息除く）",
+    "ebit_gaap": [2372, 10297, 7509],
+    "ebit_note": "= 税引前利益(継続事業) + 支払利息。FY2022は年金精算費5,894含む、FY2024は同3,113含む",
+    "ebit_adjusted": [8266, 10297, 10622],
+    "ebit_adjusted_note": "年金精算費用（一過性・非現金）を除く調整後EBIT",
+    "net_income": [1639, 7502, 6023],
+    "net_income_nongaap": [null, 8870, 9684],
+    "interest_expense": [1216, 1607, 1712],
+    "sga": [18609, 19003, 19688],
+    "rde": [6567, 6775, 7479],
+    "pension_settlement_charge_pretax": [5894, 0, 3113]
+  },
+  "bs": {
+    "total_assets": [127243, 135241, 137175],
+    "total_assets_note": "FY2022は公開FY2022 10-Kより。FY2023・FY2024は本10-K実績",
+    "equity": [22021, 22613, 27393],
+    "equity_ibm_stockholders": [21944, 22533, 27307],
+    "goodwill": [55949, 60178, 60706],
+    "intangible_assets_net": [null, 11036, 10660],
+    "total_debt": [53340, 56547, 54973],
+    "total_debt_note": "FY2022は概算（公開FY2022 10-K参照）。FY2023・FY2024は本10-K実績（短期+長期借入金）",
+    "net_debt": [null, 43106, 40382],
+    "net_debt_note": "FY2023: 56,547 - 13,068(現金) - 373(有価証券) = 43,106。FY2024: 54,973 - 13,947 - 644 = 40,382",
+    "cash_and_equiv": [null, 13068, 13947],
+    "pension_assets_prepaid": [null, 7506, 7492]
+  },
+  "cf": {
+    "operating_cf": [10435, 13931, 13445],
+    "operating_cf_note": "出典: 10-K連結キャッシュフロー計算書 p.49。単位:USD百万",
+    "investing_cf": [-4202, -7070, -4937],
+    "investing_cf_note": "出典: 10-K連結キャッシュフロー計算書 p.49。単位:USD百万",
+    "financing_cf": [-4958, -1769, -7079],
+    "financing_cf_note": "出典: 10-K連結キャッシュフロー計算書 p.49。単位:USD百万",
+    "fx_effect": [-244, 9, -359],
+    "net_change_in_cash": [1032, 5101, 1071],
+    "fcf_gaap": [8574, 12442, 12317],
+    "fcf_gaap_note": "= 営業CF - Capex net(設備投資+ソフトウェア投資-売却収入)",
+    "fcf_mgmt": [9300, 11200, 12700],
+    "fcf_mgmt_note": "経営管理定義FCF(IBMの開示定義): 営業CF(除くFinancing債権変動) - Capex net。単位:USD百万",
+    "capex_net": [-1861, -1489, -1128],
+    "capex_gross": [-1346, -1245, -1048],
+    "capex_proceeds": [111, 321, 557],
+    "software_investment": [-626, -565, -637],
+    "dividends_paid": [-5948, -6040, -6147],
+    "arr_hybrid_platform": [null, 13800, 15300],
+    "arr_openshift": [null, 1200, 1400],
+    "cf_quality_note": "3期連続で営業CF > 当期純利益。乖離の主因は年金精算費(非現金)・減価償却・無形資産償却・株式報酬。キャッシュフロー品質=良好"
+  },
+  "dupont_decomposition": {
+    "fiscal_years": ["FY2022", "FY2023", "FY2024"],
+    "net_profit_margin_pct": [2.7, 12.1, 9.6],
+    "asset_turnover_x": [0.476, 0.471, 0.461],
+    "equity_multiplier_x": [6.21, 5.88, 5.45],
+    "roe_pct": [7.9, 33.6, 24.1],
+    "roe_change_driver": [
+      "FY2022: 年金精算費5,894M(税前・非現金)が純利益率を2.7%に圧縮",
+      "FY2023→+25.7pt: 一過性年金費用消滅が主因。純利益率12.1%に正常化",
+      "FY2024→▲9.5pt: 年金精算費3,113M(税前)再計上。自己資本増加でレバレッジ縮小も重なる"
+    ]
+  },
+  "roic_wacc_analysis": {
+    "fiscal_years": ["FY2022", "FY2023", "FY2024"],
+    "nopat_adjusted": [6447, 8907, 9178],
+    "invested_capital_avg": [77261, 77761, 80763],
+    "roic_pct": [8.3, 11.5, 11.4],
+    "wacc_pct": 7.5,
+    "spread_pct": [0.8, 4.0, 3.9],
+    "value_creation": ["創造（小幅）", "創造（明確）", "創造（明確）"]
+  },
+  "segments": [
+    {
+      "name": "Software",
+      "revenue": [23629, 25011, 27085],
+      "segment_profit": [7012, 7499, 8684],
+      "opm_pct": [29.7, 30.0, 32.1],
+      "gross_margin_pct": [82.5, 82.9, 83.7],
+      "arr_hybrid_platform_bln": [null, 13.8, 15.3],
+      "growth_yoy_pct": [null, 5.8, 8.3]
+    },
+    {
+      "name": "Consulting",
+      "revenue": [20058, 20884, 20692],
+      "segment_profit": [1871, 2130, 2054],
+      "opm_pct": [9.3, 10.2, 9.9],
+      "gross_margin_pct": [25.8, 26.8, 27.0],
+      "signings": [null, 24305, 25103],
+      "growth_yoy_pct": [null, 4.1, -0.9]
+    },
+    {
+      "name": "Infrastructure",
+      "revenue": [15288, 14593, 14020],
+      "segment_profit": [2671, 2828, 2450],
+      "opm_pct": [17.5, 19.4, 17.5],
+      "gross_margin_pct": [52.8, 56.1, 55.8],
+      "growth_yoy_pct": [null, -4.5, -3.9]
+    },
+    {
+      "name": "Financing",
+      "revenue": [645, 741, 713],
+      "segment_profit": [340, 373, 348],
+      "opm_pct": [52.7, 50.3, 48.8]
+    }
+  ],
+  "peers": [
+    {
+      "name": "Accenture",
+      "roe": 32.0,
+      "roic": 22.0,
+      "pbr": null,
+      "ev_ebitda": null,
+      "opm": 15.0,
+      "note": "⚠️概算・公知数値。IBM 10-Kに記載なし。FY2024年次報告ベースの近似値"
+    },
+    {
+      "name": "Fujitsu",
+      "roe": 17.0,
+      "roic": 10.0,
+      "pbr": null,
+      "ev_ebitda": null,
+      "opm": 8.0,
+      "note": "⚠️概算・公知数値。IBM 10-Kに記載なし。FY2024年次報告ベースの近似値"
+    },
+    {
+      "name": "NTT Data",
+      "roe": 12.0,
+      "roic": 8.0,
+      "pbr": null,
+      "ev_ebitda": null,
+      "opm": 7.0,
+      "note": "⚠️概算・公知数値。IBM 10-Kに記載なし。FY2024年次報告ベースの近似値"
+    }
+  ],
+  "key_risks": {
+    "goodwill_overhang": {
+      "goodwill_fy2024_mm": 60706,
+      "goodwill_pct_of_assets": 44.2,
+      "impairment_fy2024": false,
+      "risk_level": "中程度",
+      "comment": "金利上昇(WACC上昇)シナリオで割引CF評価が低下する潜在リスク。直近の定量テストは問題なし"
+    },
+    "consulting_margin_compression": {
+      "consulting_opm_fy2024_pct": 9.9,
+      "trend": "FY2023(10.2%) → FY2024(9.9%)と微低下",
+      "risk_level": "中程度",
+      "comment": "AI・ハイブリッドクラウドへの戦略的転換投資が先行コストとして利益を圧迫"
+    },
+    "pension_settlement_charges": {
+      "pretax_fy2022_mm": 5894,
+      "pretax_fy2024_mm": 3113,
+      "nature": "非現金・一過性・非GAAP除外",
+      "risk_level": "低（財務影響小、CF不変）",
+      "comment": "FY2025以降の追加年金移転リスクは低減。米国PPPは136%積立超過"
+    }
+  },
+  "metadata": {
+    "created": "2026-06-27",
+    "source_primary": "IBM Corp FY2024 10-K (Exhibit 13 / Annual Report)",
+    "source_file": "10k_FY2024_financials_text.txt",
+    "analyst_stage": "W4 Financial Diagnosis",
+    "fy2022_total_assets_source": "公開FY2022 10-K既知値（本10-Kには未収録）",
+    "peer_data_warning": "Accenture/Fujitsu/NTT Data数値はIBM 10-Kに記載なし。公知概算値のみ。提出物使用時は一次ソース確認必須"
+  }
+}

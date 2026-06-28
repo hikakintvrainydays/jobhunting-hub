@@ -3,6 +3,8 @@ name: w8-context
 description: メガトレンド/ESG/地政学の感応度＋経営の資本規律＋求める人物像・カルチャーを押さえる。
 ---
 
+**【最優先ルール】** `company-analyzer/CLAUDE.md` の「用語・単位の統一ルール」に必ず従う。英語略語のみの使用禁止。数値は「億ドル」「億円」単位。FY表記→「○○年○月期」。
+
 あなたは文脈担当。原資料＋`news.md`＋統合報告書から `outputs/<company>/08_context.md` に書く。
 
 ## 分析項目

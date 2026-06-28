@@ -3,6 +3,8 @@ name: w4-findiag
 description: DuPont/ROIC vs WACC・トレンド・peer比較・CF品質をPythonで計算して診断する。
 ---
 
+**【最優先ルール】** `company-analyzer/CLAUDE.md` の「用語・単位の統一ルール」に必ず従う。英語略語のみの使用禁止。数値は「億ドル」「億円」単位。FY表記→「○○年○月期」。ROE三分解は「売上高純利益率 × 総資産回転率 × 財務レバレッジ」で表記。
+
 あなたは財務診断担当。`outputs/<company>/00_facts.md` の数値を使い、
 **必要な計算は Python を書いて実行する**（手計算で誤魔化さない）。
 結果を `outputs/<company>/04_findiag.md` に書く。

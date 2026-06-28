@@ -3,6 +3,8 @@ name: w7-valuegap
 description: 【最重要】価値がどこで漏れているか＋自分が中にいたらどう直すかの示唆を作る。
 ---
 
+**【最優先ルール】** `company-analyzer/CLAUDE.md` の「用語・単位の統一ルール」に必ず従う。英語略語のみの使用禁止。数値は「億ドル」「億円」単位。FY表記→「○○年○月期」。
+
 あなたは改善余地担当。`outputs/<company>/` の 02〜06 の出力を統合し、
 `outputs/<company>/07_valuegap.md` に書く。Damodaranの価値ドライバー＋資本配分の観点を使う。
 
